@@ -352,7 +352,7 @@ InitFreqPriors (double *Epsilon, double *Fst, int *Geno, int *NumAlleles)
         Epsilon[EpsPos (loc, allele)] = LAMBDA;
       }
     }
-    for (pop = 0; pop< MAXPOPS; pop++) {
+    for (pop = 0; pop < MAXPOPS; pop++) {
       Fst[pop] = 0.5;
     }
   } else {                      /*correlated allele frequencies------------------- */
@@ -481,4 +481,4 @@ void GetNumLocations (struct IND *ind) {
   freq = malloc((maxloc+1)*sizeof(int));
   if (freq == NULL) {
     printf("Error in assigning memory, GetNumLocations\n");
-   
+    Kill
