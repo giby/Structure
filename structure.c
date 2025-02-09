@@ -363,7 +363,7 @@ InitFreqPriors (double *Epsilon, double *Fst, int *Geno, int *NumAlleles)
     }
 
     for (loc = 0; loc < NUMLOCI; loc++) {
-      for (allele = 0; allele < NumAlleles[loc]); allele++) {
+      for (allele = 0; allele < NumAlleles[loc]; allele++) {
         Count[allele] = 0;
       }
       total = 0;
@@ -384,7 +384,7 @@ InitFreqPriors (double *Epsilon, double *Fst, int *Geno, int *NumAlleles)
       /*Start Epsilon at (mean sample frequencies) */
       /* add lambda to all counts to ensure positive frequencies
        * for recessive model etc */
-      for (allele = 0; allele < NumAlleles[loc]); allele++) {
+      for (allele = 0; allele < NumAlleles[loc]; allele++) {
         Epsilon[EpsPos (loc, allele)] =
             (((double) LAMBDA +
               (double) Count[allele]) / ((double) NumAlleles[loc] *
@@ -396,7 +396,7 @@ InitFreqPriors (double *Epsilon, double *Fst, int *Geno, int *NumAlleles)
     }
 
 
-    for (pop= 0; pop < MAXPOPS); pop++) {
+    for (pop= 0; pop < MAXPOPS; pop++) {
       Fst[pop] = FPRIORMEAN;    /*start Fst at the prior mean */
     }
     if (Count != NULL) {
@@ -479,4 +479,5 @@ void GetNumLocations (struct IND *ind) {
   }
 
   freq = malloc((maxloc+1)*sizeof(int));
-  for (i=0; i<=maxloc; i++)
+  for (i=0; i<=maxloc; i++) {
+    freq
