@@ -1,9 +1,6 @@
-
-
 /*Library of random number generating functions.
 
 VERSION 9-25-99
-
 
 Includes:
 Randomize()              (seed random number generator)
@@ -42,51 +39,49 @@ MORE DETAILS BELOW:
 
 
 
-
  Random number functions from random.c by Eric Roberts 
-void Randomize(void);    
-                 Seed the random number generator 
-double RandomReal(double low, double high);
-                 Get a random number between low and high 
-int RandomInteger(int low, int high);
-                 Get a random integer between low and high INCLUSIVE
-double rnd();
-                 Uniform(0,1) random number generation
+ void Randomize(void);    
+                  Seed the random number generator 
+ double RandomReal(double low, double high);
+                  Get a random number between low and high 
+ int RandomInteger(int low, int high);
+                  Get a random integer between low and high INCLUSIVE
+ double rnd();
+                  Uniform(0,1) random number generation
 
 
  Random number functions from Matthew Stephens 
-  
-double RGamma(double n,double lambda);
-                gamma random generator from Ripley, 1987, P230 
-void RDirichlet(const double * a, const int k, double * b);
-                Dirichlet random generator
-   a and b are arrays of length k, containing doubles.
-   a is the array of parameters
-   b is the output array, where b ~ Dirichlet(a)  
+   
+ double RGamma(double n,double lambda);
+                 gamma random generator from Ripley, 1987, P230 
+ void RDirichlet(const double * a, const int k, double * b);
+                 Dirichlet random generator
+    a and b are arrays of length k, containing doubles.
+    a is the array of parameters
+    b is the output array, where b ~ Dirichlet(a)  
 
 
 Functions from Brown and Lovato
 
-long RPoisson(double mu);
-                 Poisson with parameter mu
-double RExpon(double av);
-                 exponential with parameter av
-double RNormal(double mu,double sigsq) ;
-                 Normal with mean mu, var sigsq; by JKP
- ---------Helper functions from Brown and Lovato
-double fsign( double num, double sign );
-double sexpo(void);
-                 exponential with parameter 1
-double snorm(); 
-                 standard normal N(0,1)  
+ long RPoisson(double mu);
+                  Poisson with parameter mu
+ double RExpon(double av);
+                  exponential with parameter av
+ double RNormal(double mu,double sigsq) ;
+                  Normal with mean mu, var sigsq; by JKP
+  ---------Helper functions from Brown and Lovato
+ double fsign( double num, double sign );
+ double sexpo(void);
+                  exponential with parameter 1
+ double snorm(); 
+                  standard normal N(0,1)  
 
 
-double genexp(double av);   return RExpon(av); 
-long ignpoi(double mean);   return RPoisson(mean); 
-long ignuin(int low, int high);    return RandomInteger(low,high);
-double genunf(double low, double high);   return RandomReal(low,high);
-*/
-
+ double genexp(double av);   return RExpon(av); 
+ long ignpoi(double mean);   return RPoisson(mean); 
+ long ignuin(int low, int high);    return RandomInteger(low,high);
+ double genunf(double low, double high);   return RandomReal(low,high);
+ */
 
 
 #include "ran.h"
@@ -158,7 +153,7 @@ double rnd()
   return value;
 }
 /*-----------Gamma and dirichlet from Matt.----------*/
-  /* gamma random generator from Ripley, 1987, P230 */
+/* gamma random generator from Ripley, 1987, P230 */
 
 
 double RGamma(double n,double lambda)
@@ -515,474 +510,4 @@ S50:
 /*
      STEP E. EXPONENTIAL SAMPLE - SEXPO(IR) FOR STANDARD EXPONENTIAL
              DEVIATE E AND SAMPLE T FROM THE LAPLACE 'HAT'
-             (IF T <= -.6744 THEN PK < FK FOR ALL MU >= 10.)
-*/
-    e = sexpo();
-    u = rnd();  /*was ranf--JKP*/
-    u += (u-1.0);
-    t = 1.8+fsign(e,u);
-    if(t <= -0.6744) goto S50;
-    ignpoi = (long) (mu+s*t);
-    fk = (double)ignpoi;
-    difmuk = mu-fk;
-/*
-             'SUBROUTINE' F IS CALLED (KFLAG=1 FOR CORRECT RETURN)
-*/
-    kflag = 1;
-    goto S70;
-S60:
-/*
-     STEP H. HAT ACCEPTANCE (E IS REPEATED ON REJECTION)
-*/
-    if(c*fabs(u) > py*exp(px+e)-fy*exp(fx+e)) goto S50;
-    return ignpoi;
-S70:
-/*
-     STEP F. 'SUBROUTINE' F. CALCULATION OF PX,PY,FX,FY.
-             CASE IGNPOI .LT. 10 USES FACTORIALS FROM TABLE FACT
-*/
-    if(ignpoi >= 10) goto S80;
-    px = -mu;
-    py = pow(mu,(double)ignpoi)/ *(fact+ignpoi);
-    goto S110;
-S80:
-/*
-             CASE IGNPOI .GE. 10 USES POLYNOMIAL APPROXIMATION
-             A0-A7 FOR ACCURACY WHEN ADVISABLE
-             .8333333E-1=1./12.  .3989423=(2*PI)**(-.5)
-*/
-    del = 8.333333E-2/fk;
-    del -= (4.8*del*del*del);
-    v = difmuk/fk;
-    if(fabs(v) <= 0.25) goto S90;
-    px = fk*log(1.0+v)-difmuk-del;
-    goto S100;
-S90:
-    px = fk*v*v*(((((((a7*v+a6)*v+a5)*v+a4)*v+a3)*v+a2)*v+a1)*v+a0)-del;
-S100:
-    py = 0.3989423/sqrt(fk);
-S110:
-    x = (0.5-difmuk)/s;
-    xx = x*x;
-    fx = -0.5*xx;
-    fy = omega*(((c3*xx+c2)*xx+c1)*xx+c0);
-    if(kflag <= 0) goto S40;
-    goto S60;
-S120:
-/*
-     C A S E  B. (START NEW TABLE AND CALCULATE P0 IF NECESSARY)
-*/
-    muprev = 0.0;
-    if(mu == muold) goto S130;
-    muold = mu;
-    m = max(1L,(long) (mu));
-    l = 0;
-    p = exp(-mu);
-    q = p0 = p;
-S130:
-/*
-     STEP U. UNIFORM SAMPLE FOR INVERSION METHOD
-*/
-    u = rnd();  /*was ranf here-- JKP*/
-    ignpoi = 0;
-    if(u <= p0) return ignpoi;
-/*
-     STEP T. TABLE COMPARISON UNTIL THE END PP(L) OF THE
-             PP-TABLE OF CUMULATIVE POISSON PROBABILITIES
-             (0.458=PP(9) FOR MU=10)
-*/
-    if(l == 0) goto S150;
-    j = 1;
-    if(u > 0.458) j = min(l,m);
-    for(k=j; k<=l; k++) {
-        if(u <= *(pp+k-1)) goto S180;
-    }
-    if(l == 35) goto S130;
-S150:
-/*
-     STEP C. CREATION OF NEW POISSON PROBABILITIES P
-             AND THEIR CUMULATIVES Q=PP(K)
-*/
-    l += 1;
-    for(k=l; k<=35; k++) {
-        p = p*mu/(double)k;
-        q += p;
-        *(pp+k-1) = q;
-        if(u <= q) goto S170;
-    }
-    l = 35;
-    goto S130;
-S170:
-    l = k;
-S180:
-    ignpoi = k;
-    return ignpoi;
-}
-
-/*-----------------------------------*/
-double RNormal(double mu,double sd) 
-     /* Returns Normal rv with mean mu, variance sigsq.   
-        Uses snorm function of Brown and Lovato.  By JKP*/
-{
-
-  return (mu + sd*snorm());
-
-}
-/*
-**********************************************************************
-                                                                      
-                                                                      
-     (STANDARD-)  N O R M A L  DISTRIBUTION                           
-                                                                      
-                                                                      
-**********************************************************************
-**********************************************************************
-                                                                      
-     FOR DETAILS SEE:                                                 
-                                                                      
-               AHRENS, J.H. AND DIETER, U.                            
-               EXTENSIONS OF FORSYTHE'S METHOD FOR RANDOM             
-               SAMPLING FROM THE NORMAL DISTRIBUTION.                 
-               MATH. COMPUT., 27,124 (OCT. 1973), 927 - 937.          
-                                                                      
-     ALL STATEMENT NUMBERS CORRESPOND TO THE STEPS OF ALGORITHM 'FL'  
-     (M=5) IN THE ABOVE PAPER     (SLIGHTLY MODIFIED IMPLEMENTATION)  
-                                                                      
-     Modified by Barry W. Brown, Feb 3, 1988 to use RANF instead of   
-     SUNIF.  The argument IR thus goes away.                          
-                                                                      
-**********************************************************************
-     THE DEFINITIONS OF THE CONSTANTS A(K), D(K), T(K) AND
-     H(K) ARE ACCORDING TO THE ABOVEMENTIONED ARTICLE
-*/
-double snorm()    /*was snorm(void) -- JKP*/
-{
-static double a[32] = {
-    0.0,3.917609E-2,7.841241E-2,0.11777,0.1573107,0.1970991,0.2372021,0.2776904,
-    0.3186394,0.36013,0.4022501,0.4450965,0.4887764,0.5334097,0.5791322,
-    0.626099,0.6744898,0.7245144,0.7764218,0.8305109,0.8871466,0.9467818,
-    1.00999,1.077516,1.150349,1.229859,1.318011,1.417797,1.534121,1.67594,
-    1.862732,2.153875
-};
-static double d[31] = {
-    0.0,0.0,0.0,0.0,0.0,0.2636843,0.2425085,0.2255674,0.2116342,0.1999243,
-    0.1899108,0.1812252,0.1736014,0.1668419,0.1607967,0.1553497,0.1504094,
-    0.1459026,0.14177,0.1379632,0.1344418,0.1311722,0.128126,0.1252791,
-    0.1226109,0.1201036,0.1177417,0.1155119,0.1134023,0.1114027,0.1095039
-};
-static double t[31] = {
-    7.673828E-4,2.30687E-3,3.860618E-3,5.438454E-3,7.0507E-3,8.708396E-3,
-    1.042357E-2,1.220953E-2,1.408125E-2,1.605579E-2,1.81529E-2,2.039573E-2,
-    2.281177E-2,2.543407E-2,2.830296E-2,3.146822E-2,3.499233E-2,3.895483E-2,
-    4.345878E-2,4.864035E-2,5.468334E-2,6.184222E-2,7.047983E-2,8.113195E-2,
-    9.462444E-2,0.1123001,0.136498,0.1716886,0.2276241,0.330498,0.5847031
-};
-static double h[31] = {
-    3.920617E-2,3.932705E-2,3.951E-2,3.975703E-2,4.007093E-2,4.045533E-2,
-    4.091481E-2,4.145507E-2,4.208311E-2,4.280748E-2,4.363863E-2,4.458932E-2,
-    4.567523E-2,4.691571E-2,4.833487E-2,4.996298E-2,5.183859E-2,5.401138E-2,
-    5.654656E-2,5.95313E-2,6.308489E-2,6.737503E-2,7.264544E-2,7.926471E-2,
-    8.781922E-2,9.930398E-2,0.11556,0.1404344,0.1836142,0.2790016,0.7010474
-};
-static long i;
-static double snorm,u,s,ustar,aa,w,y,tt;
-    u = rnd();   /* was ranf--JKP*/
-    s = 0.0;
-    if(u > 0.5) s = 1.0;
-    u += (u-s);
-    u = 32.0*u;
-    i = (long) (u);
-    if(i == 32) i = 31;
-    if(i == 0) goto S100;
-/*
-                                START CENTER
-*/
-    ustar = u-(double)i;
-    aa = *(a+i-1);
-S40:
-    if(ustar <= *(t+i-1)) goto S60;
-    w = (ustar-*(t+i-1))**(h+i-1);
-S50:
-/*
-                                EXIT   (BOTH CASES)
-*/
-    y = aa+w;
-    snorm = y;
-    if(s == 1.0) snorm = -y;
-    return snorm;
-S60:
-/*
-                                CENTER CONTINUED
-*/
-    u = rnd();                /*was ranf--JKP*/
-    w = u*(*(a+i)-aa);
-    tt = (0.5*w+aa)*w;
-    goto S80;
-S70:
-    tt = u;
-    ustar = rnd();                /*was ranf--JKP*/
-S80:
-    if(ustar > tt) goto S50;
-    u = rnd();               /*was ranf--JKP*/
-    if(ustar >= u) goto S70;
-    ustar = rnd();               /*was ranf--JKP*/
-    goto S40;
-S100:
-/*
-                                START TAIL
-*/
-    i = 6;
-    aa = *(a+31);
-    goto S120;
-S110:
-    aa += *(d+i-1);
-    i += 1;
-S120:
-    u += u;
-    if(u < 1.0) goto S110;
-    u -= 1.0;
-S140:
-    w = u**(d+i-1);
-    tt = (0.5*w+aa)*w;
-    goto S160;
-S150:
-    tt = u;
-S160:
-    ustar = rnd();               /*was ranf--JKP*/
-    if(ustar > tt) goto S50;
-    u = rnd();               /*was ranf--JKP*/
-    if(ustar >= u) goto S150;
-    u = rnd();               /*was ranf--JKP*/
-    goto S140;
-}
-
-/*
-**********************************************************************
-     double RExpon(double av)
-                    GENerate EXPonential random deviate
-                              Function
-     Generates a single random deviate from an exponential
-     distribution with mean AV.
-                              Arguments
-     av --> The mean of the exponential distribution from which
-            a random deviate is to be generated.
-                              Method
-     Renames SEXPO from TOMS as slightly modified by BWB to use RANF
-     instead of SUNIF.
-     For details see:
-               Ahrens, J.H. and Dieter, U.
-               Computer Methods for Sampling From the
-               Exponential and Normal Distributions.
-               Comm. ACM, 15,10 (Oct. 1972), 873 - 882.
-**********************************************************************
-*/
-double RExpon(double av)
-{
-static double RExpon;
-
-    RExpon = sexpo()*av;
-    return RExpon;
-}
-
-/*
-**********************************************************************
-                                                                      
-                                                                      
-     (STANDARD-)  E X P O N E N T I A L   DISTRIBUTION                
-                                                                      
-                                                                      
-**********************************************************************
-**********************************************************************
-                                                                      
-     FOR DETAILS SEE:                                                 
-                                                                      
-               AHRENS, J.H. AND DIETER, U.                            
-               COMPUTER METHODS FOR SAMPLING FROM THE                 
-               EXPONENTIAL AND NORMAL DISTRIBUTIONS.                  
-               COMM. ACM, 15,10 (OCT. 1972), 873 - 882.               
-                                                                      
-     ALL STATEMENT NUMBERS CORRESPOND TO THE STEPS OF ALGORITHM       
-     'SA' IN THE ABOVE PAPER (SLIGHTLY MODIFIED IMPLEMENTATION)       
-                                                                      
-     Modified by Barry W. Brown, Feb 3, 1988 to use RANF instead of   
-     SUNIF.  The argument IR thus goes away.                          
-                                                                      
-**********************************************************************
-     Q(N) = SUM(ALOG(2.0)**K/K!)    K=1,..,N ,      THE HIGHEST N
-     (HERE 8) IS DETERMINED BY Q(N)=1.0 WITHIN STANDARD PRECISION
-*/
-double sexpo(void)
-{
-static double q[8] = {
-    0.6931472,0.9333737,0.9888778,0.9984959,0.9998293,0.9999833,0.9999986,1.0
-};
-static long i;
-static double sexpo,a,u,ustar,umin;
-static double *q1 = q;
-    a = 0.0;
-    u = rnd();  /* was ranf--JKP */
-    goto S30;
-S20:
-    a += *q1;
-S30:
-    u += u;
-    if(u <= 1.0) goto S20;
-    u -= 1.0;
-    if(u > *q1) goto S60;
-    sexpo = a+u;
-    return sexpo;
-S60:
-    i = 1;
-    ustar = rnd();
-    umin = ustar;
-S70:
-    ustar = rnd();  /* was ranf--JKP */
-    if(ustar < umin) umin = ustar;
-    i += 1;
-    if(u > *(q+i-1)) goto S70;
-    sexpo = a+umin**q1;
-    return sexpo;
-}
-
-/*------------------------------------*/
-double fsign( double num, double sign )
-/* Transfers sign of argument sign to argument num */
-{
-if ( ( sign>0.0f && num<0.0f ) || ( sign<0.0f && num>0.0f ) )
-    return -num;
-else return num;
-}
-
-/*------------------------------------*/
-double genexp(double av)
-{
-  return RExpon(av);
-}
-/*------------------------------------*/
-long ignpoi(double mean)
-{
-  return RPoisson(mean);
-}
-/*------------------------------------*/
-long ignuin(int low, int high)
-{
-  return RandomInteger(low,high);
-}
-/*-------------------------------------*/
-double genunf(double low, double high)
-{
-  return RandomReal(low,high);
-}
-/*-------------------------------------*/
-long Binomial(int n, double p)
-/*returns a binomial random number, for the number of successes in n trials
-  with prob of sucess p.  There's probably a qicker algorithm than this, but I
-  can't see how to write the cumulative prob in a simple form*/
-{
-  int i,sofar;
-
-  sofar = 0;
-  for (i=0; i<n; i++)
-    if (rnd() < p) sofar++;
-  return sofar;
-  
-}
-/*-------------------------------------*/
-long Binomial1(int n, double p)
-/*returns a binomial random number, for the number of successes in n
-trials with prob of sucess p.  There's probably a qicker algorithm
-than this, but I can't see how to write the cumulative prob in a
-simple form.  This more complicated algorithm, which involves summing
-the probabilities appears to be substantially slower than the
-simple-minded approach, above.*/
-{
-  double cum = 0.0;
-  int up,down; 
-  /*  double upvalue,downvalue; */
-  double rv;
-  /*  double q = 1 - p; */
-
-  if (p<=0.0) return 0;  /*trivial cases*/
-  if (p>=1.0) return 0;
-  if (n<1) return 0;
-  
-  rv = rnd();            /*random number in (0,1)*/
-  up = n*p;              /*start at mean and work out, adding probs to the total (cum)*/
-  down = up;
-  
-  do
-    {
-      if (up <= n)
-	{
-	  cum += BinoProb(n,p,up);
-	  if (rv <= cum) return up;
-	  up++;
-	}
-      down--;
-      if (down >= 0)
-	{	  
-	  cum += BinoProb(n,p,down);
-	  if (rv <= cum) return down;
-	}
-    }
-  while ((up <=n ) || (down >= 1));
-
-  return Binomial(n,p);  /*in case of reaching no result...possibly due to underflow(?)*/
-}
-/*-------------------------------------*/
-double BinoProb(int n, double p,int i)
-/*returns the prob of i successes in n trials with prob of sucess p.*/
-{
-
-  double logsum = 0.0;
-  double runningtotal = 1.0;
-  int j;
-
-  if (i>(n-i))  /*figure out the n-choose-i part*/
-    {
-      for (j=2; j <= (n-i); j++)
-	{
-	  runningtotal /= j;
-	  if (runningtotal<UNDERFLO)
-	    {
-	      logsum += log(runningtotal);
-	      runningtotal = 1.0;
-	    }
-	}
-      for (j=i+1; j <= n; j++)
-	{
-	  runningtotal *= j;
-	  if (runningtotal>OVERFLO)
-	    {
-	      logsum += log(runningtotal);
-	      runningtotal = 1.0;
-	    }
-	}
-    }
-  else
-    {
-      for (j=2; j <= i; j++)
-	{
-	  runningtotal /= j;
-	  if (runningtotal<UNDERFLO)
-	    {
-	      logsum += log(runningtotal);
-	      runningtotal = 1.0;
-	    }
-	}
-      for (j=n-i+1; j <= n; j++)
-	{
-	  runningtotal *= j;
-	  if (runningtotal>OVERFLO)
-	    {
-	      logsum += log(runningtotal);
-	      runningtotal = 1.0;
-	    }
-	}
-    }
-  logsum += log(runningtotal);
-  logsum += i*log(p);
-  logsum += (n-i)*log(1-p);
-  
-  return exp(logsum);
-}
+             (IF T <= -.6744 THEN PK < FK FOR ALL MU >=
