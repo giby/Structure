@@ -133,10 +133,7 @@ void isort(int n, int *arr)
 }
 
 
-void sort2(n,arr,brr)
-double arr[];
-int brr[];
-unsigned long n;
+void sort2(int n, double *arr, int *brr)
 {
 	unsigned long i,ir=n,j,k,l=1,*istack;
 	int jstack=0;
@@ -213,3 +210,4 @@ unsigned long n;
 #undef M
 #undef NSTACK
 #undef SWAP
+#undef ISWAP
