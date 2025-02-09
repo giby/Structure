@@ -466,7 +466,7 @@ CheckPopPriors (struct IND *Individual)
   all the individuals so that ind[i].myloc is in (0...NUMLOCATIONS).  ind[i].loc is unchanged
   to whatever the input file indicates*/
 void GetNumLocations (struct IND *ind) {
-  int maxloc=0, i, j, *freq, pos;
+  int maxloc=0, i, *freq;
   for (i=0; i<NUMINDS; i++) {
     /* for now we're not dealing with unknown location */
     if (ind[i].Location < 0) {
@@ -480,4 +480,5 @@ void GetNumLocations (struct IND *ind) {
 
   freq = malloc((maxloc+1)*sizeof(int));
   if (freq == NULL) {
-      printf("Error in assigning memory, GetNum
+    printf("Error in assigning memory, GetNumLocations\n");
+   
