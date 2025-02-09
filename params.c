@@ -1,4 +1,3 @@
-
 /*Part of structure.c.  
 
 This bit is in charge of reading in the parameters from the files
@@ -26,7 +25,7 @@ Command line flags: enter the appropriate flag followed by new value :
 #include <math.h>
 #include <ctype.h>
 #include "structure.h"
-#include "string.h"
+#include <string.h>
 
 #define MAXNAME 30  /*maximum length of parameter names*/
 FILE *PARAMS; /*parameter files*/
@@ -35,16 +34,16 @@ FILE *PARAMS; /*parameter files*/
 void ReadFile();
 void GetParamValue();
 void SetValue(char Word[]);
-void OpenFile(char input[15]);
+void OpenFile(const char input[15]);
 void PresetValues();
 void CheckIfMissing();
 int Whitespace(char next);
-void InputFileNames(int argc, char *argv[], char filename[], char flag[50]);
-void CommandLineValues(int argc, char *argv[]);
+void InputFileNames(int argc, const char *argv[], char filename[], const char flag[50]);
+void CommandLineValues(int argc, const char *argv[]);
 
 
 /*=======MAIN FUNCTION FOR THIS PART OF THE PROGRAM============*/
-void GetParams(int strat, int argc, char *argv[])
+void GetParams(int strat, int argc, const char *argv[])
      /*the value of strat is 1 if this is called from STRAT.c, otherwise 0*/
      /*This function takes in all the values of the parameters.  The default
        is to get these all from main- extra- and STRATparams, but they can
@@ -82,11 +81,11 @@ void GetParams(int strat, int argc, char *argv[])
   UPDATEFREQ = SetUpdateFreq();
 } 
 /*-------------------------------------------*/
-void CommandLineValues(int argc, char *argv[])
+void CommandLineValues(int argc, const char *argv[])
 {
   char value[100];
   int i;
-  int CommandLineInts(char *value, char parameter[100]);
+  int CommandLineInts(const char *value, const char parameter[100]);
   /*
 -i input file 
 -o output file
@@ -114,7 +113,7 @@ void CommandLineValues(int argc, char *argv[])
     }
 }
 /*-------------------------------------------*/
-int CommandLineInts(char *value, char parameter[100])
+int CommandLineInts(const char *value, const char parameter[100])
      /*the point of this function is to take the values entered at the command
        line (for MAXPOPS, etc) and make sure they are valid integers*/
 {
@@ -137,7 +136,7 @@ int CommandLineInts(char *value, char parameter[100])
   return atoi(value);
 }
 /*-------------------------------------------*/
-void InputFileNames(int argc, char *argv[], char filename[], char flag[50])
+void InputFileNames(int argc, const char *argv[], char filename[], const char flag[50])
      /*This function checks whether there is a command line flag to
      indicate that a different input file should be used instead of
      mainparams, extraparams or STRATparams*/
@@ -185,7 +184,6 @@ void InputFileNames(int argc, char *argv[], char filename[], char flag[50])
   for(i=0;i<strlen(filename);i++){
     if(filename[i]=='\"'){           /*" [fix highlighting*/
       shift++;
-
     }
     filename[i]=filename[i+shift];
     if(filename[i]=='\"')          /*" [fix highlighting*/
@@ -205,7 +203,7 @@ void ReadFile()
     form "#define NUMINDS 424" which define parameter values*/
 
   int notEOF = 1;  /*switch this to 0 when we hit EOF*/
-  char next;
+  int next;
 
   do         /*scan the file for # until EOF is reached*/
     {
@@ -235,8 +233,8 @@ int  ReadSpaceString(char Word[],int maxlength,FILE *THEFILE)
      * read through the string, includs all intermediate spaces, terminate
      * reading at "//" sign or new line. */
 {
-  char next;
-  char last=0;
+  int next;
+  int last=0;
   int length = 0;
   /*  int white; */ /* 1 if next is whitespace*/
   int temp_length;
@@ -296,7 +294,7 @@ int  ReadString(char Word[],int maxlength,FILE *THEFILE)
      reached before any words.  If string is too long, moves cursor
      to next whitespace anyway.*/
 {
-  char next;
+  int next;
   int length = 0;
   int white; /* 1 if next is whitespace*/
 
@@ -312,7 +310,7 @@ int  ReadString(char Word[],int maxlength,FILE *THEFILE)
 	}
       else if (length>0) break;  /*break if new whitespace*/
     }  
-   
+    
   if (length>0)   /*add end position*/
     {
       Word[length] = '\0';
@@ -407,315 +405,5 @@ void SetValue(char Word[])
   else if (!(strcmp(Word,"METROFREQ"))) fscanf(PARAMS,"%d",&METROFREQ);
   else if (!(strcmp(Word,"REPORTHITRATE"))) fscanf(PARAMS,"%d",&REPORTHITRATE);
 
-/* HIDDEN PARAMETERS */
-  else if (!(strcmp(Word,"NOQS"))) fscanf(PARAMS,"%d",&NOQS);  
-  else if (!(strcmp(Word,"POSTERIOR"))) fscanf(PARAMS,"%d",&POSTERIOR);
-  else if (!(strcmp(Word,"PICTUREFILE"))) fscanf(PARAMS,"%d",&PICTUREFILE);
-  else if (!(strcmp(Word,"INDIVIDUALR"))) fscanf(PARAMS,"%d",&INDIVIDUALR);
-  
-/*STRAT parameters*/
-  else if (!(strcmp(Word,"NUMSIMSTATS"))) fscanf(PARAMS,"%d",&NUMSIMSTATS);
-  else if (!(strcmp(Word,"EMERROR"))) fscanf(PARAMS,"%lf",&EMERROR);
-  /* else if (!(strcmp(Word,"NUMPHENS"))) fscanf(PARAMS,"%d",&NUMPHENS);*/
-  else if (!(strcmp(Word,"POOLFREQ"))) fscanf(PARAMS,"%d",&POOLFREQ);
-  else if (!(strcmp(Word,"LOCUSxONLY"))) fscanf(PARAMS,"%d",&LOCUSxONLY);
-  else if (!(strcmp(Word,"PHENOTYPECOL"))) fscanf(PARAMS,"%d",&PHENOTYPECOL);
-  else if (!(strcmp(Word,"MISSINGPHENO"))) fscanf(PARAMS,"%d",&MISSINGPHENO);
-
-  /*Melissa added 7/12/07 to input popprior parameters*/
-  else if (strcmp(Word, "LOCPRIOR")==0) fscanf(PARAMS, "%i", &LOCPRIOR);
-  else if (strcmp(Word, "UPDATELOCPRIOR")==0) fscanf(PARAMS, "%i", &UPDATELOCPRIOR);
-  else if (strcmp(Word, "LOCPRIORINIT")==0) fscanf(PARAMS, "%lf", &LOCPRIORINIT);
-  else if (strcmp(Word, "MAXLOCPRIOR")==0) fscanf(PARAMS, "%lf", &MAXLOCPRIOR);
-  else if (strcmp(Word, "LOCISPOP")==0) fscanf(PARAMS, "%i", &LOCISPOP);
-  else if (strcmp(Word, "LOCDATA")==0) fscanf(PARAMS, "%i", &LOCDATA);
-  else if (strcmp(Word, "LOCPRIORSTEP")==0) fscanf(PARAMS, "%lf", &LOCPRIORSTEP);
-
-  /*Melissa added 1/15/08 so that seed can be set*/
-  else if (strcmp(Word, "SEED")==0) {fscanf(PARAMS, "%i", &SEED);}
-
-  else
-    printf("Warning:  Ignoring unrecognized parameter name (%s)\n",Word);
-    
-}
-/*-------------------------------------------*/
-int Whitespace(char next)
-     /*return 1 if next is whitespace (not including EOF));*/
-{
-  if ((next!=' ')&&(next!='\n')&&(next!='\t'))
-    return (0);
-  else return (1);
-}
-/*-------------------------------------------*/
-void OpenFile(char input[15])
-{
-  /* int trouble = 0; */
-  PARAMS = fopen(input,"r");
-
-  if (PARAMS==NULL)
-    {
-      printf("Can't open the file \"%s\".\n",input);  
-      Kill();
-    }
-  else printf("Reading file \"%s\".\n",input); 
-}
-/*-------------------------------------------*/
-void PresetValues()
-{
-  /*Data File*/
-  strcpy(DATAFILE,"\0");
-  strcpy(OUTFILE,"output");
-  MARKOVPHASE=-1;
-  NUMINDS=0;
-  NUMLOCI=0;
-  LINKAGE=0;
-  LOG10RMIN=-8;
-  LOG10RMAX=2;
-  LOG10RSTART=-4;
-  LOG10RPROPSD=0.1;
-  MISSING=-9;
-  LABEL=-1;
-  POPDATA=-1;
-  POPFLAG=-1;
-  PHENOTYPE=-1;
-  EXTRACOLS=-1;
-  LINES=2;
-  ONEROWPERIND=0;
-  RECESSIVEALLELES=0;
-  NOTAMBIGUOUS=-939;
-  MAPDISTANCES=0;
-  MARKERNAMES=0;
-  PHASEINFO=0;
-  /*Program Parameters*/
-  MAXPOPS=-1;
-  BURNIN=10000;
-  NUMREPS=20000;
-  /*Program options*/
-  USEPOPINFO=0;
-  PFROMPOPFLAGONLY = 0;
-  INFERALPHA=1;
-  INFERLAMBDA=0;
-  POPSPECIFICLAMBDA=0;
-  POPALPHAS=0;
-  COMPUTEPROB=1;
-  NOADMIX=0;
-  ADMBURNIN=(int) BURNIN/4;
-  PRINTQHAT=0;
-  PRINTQSUM=0;
-  SITEBYSITE=0;
-  PHASED=1;  /*this is the default since unphased data is necessarily diploid and requires extra input*/
-  /*Output Options*/
-  UPDATEFREQ=200;
-  PRINTLIKES=0;
-  INTERMEDSAVE=0;
-  PRINTKLD=0;
-  PRINTNET=0;
-  PRINTLAMBDA=0;
-  ANCESTDIST=0;
-  NUMBOXES=1000;
-  ANCESTPINT=0.90;
-  GENSBACK=2;
-  /*Priors*/
-  MIGRPRIOR=0.05;
-  ALPHA=1.0;
-  FREQSCORR=1;
-  ONEFST=0;
-  FPRIORMEAN=0.1;
-  FPRIORSD=0.1;
-  LAMBDA=1.0;
-  UNIFPRIORALPHA=1;
-  ALPHAMAX=10.0;
-  ALPHAPRIORA=1.0;
-  ALPHAPRIORB=2.0;
-  /*Miscellaneous*/
-  ALPHAPROPSD=0.05;
-  STARTATPOPINFO=0;
-  /*Obscure options*/
-  RANDOMIZE=1;
-  METROFREQ=20;
-  REPORTHITRATE=0;
-
-/*STRAT parameters*/
-  NUMSIMSTATS = 1000;
-  EMERROR = 0.001;
-  POOLFREQ = 10;
-  LOCUSxONLY = 0;
-  PHENOTYPECOL = -9;   /*indicates that this has not been entered*/
-  MISSINGPHENO = -9;
-
- /* hidden options */
-  PICTUREFILE=0;  
-  NOQS=0;
-  POSTERIOR=1;
-  INDIVIDUALR=0;
-
-  /*Melissa added 7/12/07*/
-  LOCPRIOR=0;
-  UPDATELOCPRIOR=1;
-  LOCPRIORINIT=1.0;
-  LOCDATA=0;
-  LOCISPOP=0;
-  LOCPRIORSTEP=0.1;
-  MAXLOCPRIOR=20.0;
-  PRINTLOCPRIOR=1;
-
-  SEED=-1;
-}
-/*------------------------------------*/
-void CheckIfMissing(int strat)
-     /*Kill program if certain key bits of information (mostly about
-the input file) have not been entered.  strat is a Boolean which says
-whether this was called from structure (0) or STRAT (1) */
-
-{
-  int trouble=0;
-
-  if (!(strcmp(DATAFILE,"\0")))
-      {printf("Need to specify the name of the data file\n"); trouble=1;}
-  if (NUMINDS<1)
-    {printf("Need to set NUMINDS>0 in the file mainparams\n"); trouble=1;}
-  if (NUMLOCI<1)
-    {printf("Need to set NUMLOCI>0 in the file mainparams\n"); trouble=1;}
-  if (LABEL==-1)
-    {printf("Need to set LABEL=0 or 1 in the file mainparams\n"); trouble=1;}
-  if (POPDATA==-1)
-    {printf("Need to set POPDATA=0 or 1 in the file mainparams\n"); trouble=1;}
-  if (POPFLAG==-1)
-    {printf("Need to set POPFLAG=0 or 1 in the file mainparams\n"); trouble=1;}
-  if (PHENOTYPE==-1)
-    {printf("Need to set PHENOTYPE=0 or 1 in the file mainparams\n"); trouble=1;}
-  if (EXTRACOLS<0)
-    {printf("Need to set EXTRACOLS>=0 in the file mainparams\n"); trouble=1;}
-
-/*
-  if (MAXPOPS<1)
-    {printf("Need to set MAXPOPS>0 in the file mainparams\n"); trouble=1;}
-*/
-  if (strat)
-    {
-      if (PHENOTYPE==0)
-	{printf("Need to set PHENOTYPE=1 in the file mainparams to run STRAT\n"); trouble=1;}
-      if (EMERROR<=0.0)
-	{printf("Need to set EMERROR>0 in the file STRATparams\n"); trouble=1;}
-      /*if (NUMPHENS<=1)
-	{printf("Need to set NUMPHENS>1 in the file STRATparams\n"); trouble=1;}*/
-    }
-
-  /*Melissa added 7/12/07 to make sure we have location data when using poppriors*/
-  if (LOCPRIOR && LOCDATA<0) {
-    if (LOCISPOP==0 || POPDATA < 0) {
-      printf("Need to specify location data when LOCPRIOR=%i\n", LOCPRIOR);
-      printf("LOCISPOP=%i POPDATA=%i\n", LOCISPOP, POPDATA);
-      trouble=1;
-    }
-  }
-  if (LOCPRIOR && LINKAGE) /* added JKP 2-27-09 */
-    {
-      printf("Cannot run LOCPRIOR and the LINKAGE model together\n");
-      trouble=1;
-    }
-
-  if (trouble) Kill();
-
-}
-/*------------------------------------*/
-int SetUpdateFreq()
-/*if UPDATEFREQ is set to 0, set it automatically.  I figure we want an
-update about once every 200,000 genotypes, but it should be an even number.
-(Obviously this depends on machine speed, but this is probably about right)*/
-{
-  int numgens = LINES*NUMINDS*NUMLOCI;
-  int approxfreq = (int) 4000000/numgens;
- 
-  if (UPDATEFREQ > 0) return UPDATEFREQ; /*ie retain user-specified value*/
-  
-  else if (approxfreq <= 15) return 10;
-  else if (approxfreq <= 37) return 25;
-  else if (approxfreq <= 75) return 50;
-  else if (approxfreq <= 250) return 100*((int)(approxfreq + 50)/100); 
-                  /*intervals of 100*/
-  else return 500*((int) (approxfreq + 250)/500);     /*intervals of 500*/
-
-}
-/*---------------------------------------------------*/
-void PrintAllParams(FILE *file)
-{
-  /*print values of all parameters*/
-
-  fprintf(file,"Values of parameters used in structure:\n");
-  fprintf(file,"DATAFILE=%s,\t",DATAFILE);
-  fprintf(file,"OUTFILE=%s,\t",OUTFILE);
-  fprintf(file,"NUMINDS=%d,\t",NUMINDS);
-  fprintf(file,"NUMLOCI=%d,\t",NUMLOCI);
-  fprintf(file,"MISSING=%d,\t",ORIGMISSING);
-  fprintf(file,"LABEL=%d,\t",LABEL);
-  fprintf(file,"POPDATA=%d,\t",POPDATA);
-  fprintf(file,"POPFLAG=%d,\t",POPFLAG);
-  fprintf(file,"PHENOTYPE=%d,\t",PHENOTYPE);
-  fprintf(file,"EXTRACOLS=%d,\t",EXTRACOLS);
-  fprintf(file,"MAXPOPS=%d,\t",MAXPOPS);
-  fprintf(file,"BURNIN=%d,\t",BURNIN);
-  fprintf(file,"NUMREPS=%d,\t",NUMREPS);
-  fprintf(file,"USEPOPINFO=%d,\t",USEPOPINFO);
-  fprintf(file,"INFERALPHA=%d,\t",INFERALPHA);
-  fprintf(file,"INFERLAMBDA=%d,\t",INFERLAMBDA);
-  fprintf(file,"POPSPECIFICLAMBDA=%d,\t",POPSPECIFICLAMBDA);
-  fprintf(file,"POPALPHAS=%d,\t",POPALPHAS);
-  fprintf(file,"COMPUTEPROB=%d,\t",COMPUTEPROB);
-  fprintf(file,"NOADMIX=%d,\t",NOADMIX);
-  fprintf(file,"ADMBURNIN=%d,\t",ADMBURNIN);
-  fprintf(file,"UPDATEFREQ=%d,\t",UPDATEFREQ);
-  fprintf(file,"PRINTLIKES=%d,\t",PRINTLIKES);
-  fprintf(file,"INTERMEDSAVE=%d,\t",INTERMEDSAVE);
-  fprintf(file,"PRINTKLD=%d,\t",PRINTKLD);
-  fprintf(file,"PRINTNET=%d,\t",PRINTNET);
-  fprintf(file,"PRINTLAMBDA=%d,\t",PRINTLAMBDA);
-  fprintf(file,"ANCESTDIST=%d,\t",ANCESTDIST);
-  fprintf(file,"NUMBOXES=%d,\t",NUMBOXES);
-  fprintf(file,"ANCESTPINT=%1.5f,\t",ANCESTPINT);
-  fprintf(file,"GENSBACK=%d,\t",GENSBACK);
-  fprintf(file,"MIGRPRIOR=%1.5f,\t",MIGRPRIOR);
-  fprintf(file,"PRINTQHAT=%d,\t",PRINTQHAT);
-  fprintf(file,"PRINTQSUM=%d,\t",PRINTQSUM);
-  fprintf(file,"ALPHA=%1.4f,\t",ALPHA);
-  fprintf(file,"FREQSCORR=%d,\t",FREQSCORR);
-  fprintf(file,"FPRIORMEAN=%1.4f,\t",FPRIORMEAN);
-  fprintf(file,"FPRIORSD=%1.4f,\t",FPRIORSD);
-  fprintf(file,"ONEFST=%d,\t",ONEFST);
-  fprintf(file,"LAMBDA=%1.4f,\t",LAMBDA);
-  fprintf(file,"UNIFPRIORALPHA=%d,\t",UNIFPRIORALPHA);
-  fprintf(file,"ALPHAMAX=%1.4f,\t",ALPHAMAX);
-  fprintf(file,"ALPHAPRIORA=%1.4f,\t",ALPHAPRIORA);
-  fprintf(file,"ALPHAPRIORB=%1.4f,\t",ALPHAPRIORB);
-  fprintf(file,"ALPHAPROPSD=%1.4f,\t",ALPHAPROPSD);
-  fprintf(file,"STARTATPOPINFO=%d,\t",STARTATPOPINFO);
-  fprintf(file,"RANDOMIZE=%d,\t",RANDOMIZE);
-  fprintf(file,"LINKAGE=%d,\t",LINKAGE);
-  fprintf(file,"METROFREQ=%d,\t",METROFREQ);
-  fprintf(file,"REPORTHITRATE=%d,\t",REPORTHITRATE);
-  fprintf(file,"MARKOVPHASE=%d,\t",MARKOVPHASE);
-  /* Daniel made the change: adding the following lines on Dec 24, 2002 */
-  fprintf(file,"PHASED=%d,\t",PHASED);
-  fprintf(file,"PLOIDY=%d,\t",LINES);
-  fprintf(file,"PHASEINFO=%d\t",PHASEINFO);
-  /* Melissa added 7/12/07 */
-  fprintf(file, "LOCPRIOR=%d, \t", LOCPRIOR);
-  fprintf(file, "LOCPRIORINIT=%f, \t", LOCPRIORINIT);
-  fprintf(file, "LOCDATA=%d, \t", LOCDATA);
-  fprintf(file, "LOCISPOP=%d, \t", LOCISPOP);
-  fprintf(file, "LOCPRIORSTEP=%f, \t", LOCPRIORSTEP);
-  fprintf(file, "MAXLOCPRIOR=%f, \t", MAXLOCPRIOR);
-
-  /* seed: added Jan 08 */
-  fprintf(file, "SEED=%d,\t", SEED);
-
-  /* strat parameters: added June 03 */
-  fprintf(file, "\n[STRAT parameters]:    ");
-  fprintf(file,"NUMSIMSTATS=%d,\t",NUMSIMSTATS);
-  fprintf(file,"PHENOTYPECOL=%d,\t",PHENOTYPECOL);
-  fprintf(file,"POOLFREQ=%d,\t",POOLFREQ);
-  fprintf(file,"LOCUSxONLY=%d,\t",LOCUSxONLY);
-  fprintf(file,"EMERROR=%1.5f,\t",EMERROR);
-  fprintf(file,"MISSINGPHENO=%d,\t",MISSINGPHENO);
-
-}
+  /* HIDDEN PARAMETERS */
+  else if (!(strcmp(Word,"NOQS"))) fscanf(PARAMS,"%
