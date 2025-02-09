@@ -462,7 +462,7 @@ CheckPopPriors (struct IND *Individual)
 }
 
 
-/*GetNumLocations: Melissa added 7/12/07.  Sets the variable NUMLOCATIONS and also setse
+/*GetNumLocations: Melissa added 7/12/07.  Sets the variable NUMLOCATIONS and also sets
   all the individuals so that ind[i].myloc is in (0...NUMLOCATIONS).  ind[i].loc is unchanged
   to whatever the input file indicates*/
 void GetNumLocations (struct IND *ind) {
@@ -479,5 +479,5 @@ void GetNumLocations (struct IND *ind) {
   }
 
   freq = malloc((maxloc+1)*sizeof(int));
-  for (i=0; i<=maxloc; i++) {
-    freq
+  if (freq == NULL) {
+      printf("Error in assigning memory, GetNum
