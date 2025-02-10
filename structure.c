@@ -481,4 +481,4 @@ void GetNumLocations (struct IND *ind) {
   freq = malloc((maxloc+1)*sizeof(int));
   if (freq == NULL) {
     printf("Error in assigning memory, GetNumLocations\n");
-    Kill
+   
